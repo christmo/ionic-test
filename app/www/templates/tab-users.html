@@ -1,0 +1,26 @@
+<ion-view view-title="Users">
+  <ion-content class="padding">
+
+    <div class="list">
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Id</span>
+        <input type="text" ng-model="user.userId">
+      </label>
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Nick</span>
+        <input type="text" placeholder="John" ng-model="user.nick">
+      </label>
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Password</span>
+        <input type="password" placeholder="Clave" ng-model="user.password">
+      </label>
+      <label class="item item-input item-stacked-label">
+        <span class="input-label">Alias</span>
+        <input type="text" placeholder="john" ng-model="user.alias">
+      </label>
+    </div>
+
+    <button class="button button-assertive" ng-click="guardar()">Guardar</button>
+    <button class="button button-assertive" ng-click="test()">test</button>
+  </ion-content>
+</ion-view>

@@ -1,0 +1,61 @@
+<ion-view view-title="Dashboard">
+  <ion-content class="padding">
+    <ion-refresher
+            pulling-text="Pull to refresh..."
+            on-refresh="doRefresh()">
+    </ion-refresher>
+    <div class="list card">
+      <div class="item item-divider">Usuarios</div>
+      <div class="item item-body">
+        <a href="#" class="item item-icon-left" ng-repeat="user in users">
+          <i class="icon ion-home"></i>
+          {{user.nick}}<br/>
+          {{user.password}}
+        </a>
+      </div>
+    </div>
+
+    <!--<div class="list card">
+      <div class="item item-divider">Upcoming</div>
+      <div class="item item-body">
+        <label class="item item-input">
+          <span class="input-label">Username</span>
+          <input type="text" ng-model="dash.nombre">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Password</span>
+          <input type="text" ng-model="dash.apellido">
+        </label>
+
+        <button class="button button-assertive" ng-click="enviar()">Enviar</button>
+      </div>
+    </div>-->
+
+
+
+    <!--<div class="list card">
+      <div class="item item-divider">Recent Updates</div>
+      <div class="item item-body">
+        <div>
+          There is a fire in <b>sector 3</b>
+        </div>
+      </div>
+    </div>
+    <div class="list card">
+      <div class="item item-divider">Health</div>
+      <div class="item item-body">
+        <div>
+          You ate an apple today!
+        </div>
+      </div>
+    </div>
+    <div class="list card">
+      <div class="item item-divider">Upcoming</div>
+      <div class="item item-body">
+        <div>
+          You have <b>29</b> meetings on your calendar tomorrow.
+        </div>
+      </div>
+    </div>-->
+  </ion-content>
+</ion-view>
