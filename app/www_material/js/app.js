@@ -33,7 +33,8 @@ angular.module('starter', ['ionic','ionMdInput'])
                 url: "/home",
                 views: {
                     'menuContent' :{
-                        templateUrl: "templates/home.html"
+                        templateUrl: "templates/home.html",
+                        controller: 'SearchCtrl'
                     }
                 }
             })
@@ -296,7 +297,217 @@ angular.module('starter', ['ionic','ionMdInput'])
         // Set Ink
         ionic.material.ink.displayEffect();
     })
+
     .controller('SearchCtrl', function($scope, $stateParams, $timeout) {
         $scope.$parent.showHeader();
+    })
+
+    .controller('MapCtrl', function($scope) {
+        $scope.i = 0;
+        var svg = d3.select("svg");
+        var points = [[50, 50]];
+        var dragged = null;
+        var selected = points[0];
+        var height = 0;
+        var width = 0;
+
+        svg.attr("tabindex", 1);
+
+        if(svg[0][0].attributes.height) {
+            height = svg[0][0].attributes.height.value;
+        }
+        if(svg[0][0].attributes.width){
+            width = svg[0][0].attributes.width.value;
+        }
+
+        svg.on("click", clickSVG)
+            .on("mouseup", mouseup)
+            .on("keydown", keydown)
+            .on("mousedown", mousedown)
+            .on("mousemove", mouseCoordenates)
+        ;
+        svg.node().focus();
+
+        //*-----------------------------------------
+        //*EVENTS
+        //*-----------------------------------------
+        function clickSVG(data) {
+            // Ignore the click event if it was suppressed
+            if (d3.event.defaultPrevented) {
+                return;
+            }
+            if ($scope.edit) {
+                var point = d3.mouse(this);
+                addBlockMark(point[0], point[1]);
+            }
+            //addPolygon(p.x, p.y);
+        }
+
+        function mouseCoordenates() {
+            var point = d3.mouse(this);
+            svg.select("#coords").remove();
+            svg.append("text").text(point[0] + ":" + point[1])
+                .attr("id", "coords")
+                .attr("x", 20)
+                .attr("y", 20)
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "15px")
+                .attr("fill", "red");
+        }
+
+        function mousedown() {
+            points.push(selected = dragged = d3.mouse(svg.node()));
+            redraw();
+        }
+
+        function redraw() {
+            var circle = svg.selectAll("circle")
+                .data(points, function(d) {
+                    return d;
+                });
+
+            circle.enter().append("circle")
+                .attr("r", 1e-6)
+                .on("mousedown", function(d) {
+                    selected = dragged = d;
+                    redraw();
+                })
+                .transition()
+                .duration(750)
+                .ease("elastic")
+                .attr("r", 4.5);
+
+            circle
+                .classed("selected", function(d) {
+                    return d === selected;
+                })
+                .attr("cx", function(d) {
+                    return d[0];
+                })
+                .attr("cy", function(d) {
+                    return d[1];
+                });
+
+            circle.exit().remove();
+
+            if (d3.event) {
+                d3.event.preventDefault();
+                d3.event.stopPropagation();
+            }
+        }
+
+        function mousemove() {
+            if (!dragged){
+                return;
+            }
+            var m = d3.mouse(svg.node());
+            dragged[0] = Math.max(0, Math.min(width, m[0]));
+            dragged[1] = Math.max(0, Math.min(height, m[1]));
+            redraw();
+        }
+
+        function mouseup() {
+            if (!dragged){
+                return;
+            }
+            console.log("mouse up");
+            //mouseCoordenates();
+            dragged = null;
+        }
+
+        function keydown() {
+            console.log(selected,d3.event.keyCode);
+            if (!selected){
+                return;
+            }
+            switch (d3.event.keyCode) {
+                case 8: // backspace
+                case 46:
+                { // delete
+                    var i = points.indexOf(selected);
+                    points.splice(i, 1);
+                    selected = points.length ? points[i > 0 ? i - 1 : 0] : null;
+                    redraw();
+                    break;
+                }
+            }
+        }
+
+        function addPolygon(x, y) {
+            svg.append("polygon").attr("points", "100,50, 200,150, 300,50")
+                //.data([{ wasDragged: true, id:$scope.i}])
+                //.attr("r", "10")
+                .attr("transform", "translate(" + x + "," + y + ")")
+                .attr("class", "blockmark")
+                .call(dragBehavior)
+                .on('click', clickCircle);
+            $scope.i++;
+        }
+
+        function addBlockMark(x, y) {
+            if(!$scope.clickInCicle){
+                svg.append("circle")
+                    .data([{wasDragged: false, id: $scope.i}])
+                    .attr("r", "10")
+                    .attr("id", $scope.i)
+                    .attr("transform", "translate(" + x + "," + y + ")")
+                    .attr("class", "blockmark")
+                    .call(dragBehavior)
+                    .on('click', clickCircle);
+                $scope.i++;
+            }else{
+                $scope.clickInCicle = false;
+            }
+        }
+
+        var dragBehavior = d3.behavior.drag()
+            //.on('dragend', onDragStart)
+            .on('drag', onDrag)
+        //.on('dragend', onDragEnd);
+
+        function onDragStart() {
+            console.log('onDragStart');
+        }
+
+        function onDrag(data) {
+            //console.log('onDrag');
+            if ($scope.edit) {
+                var x = d3.event.x;
+                var y = d3.event.y;
+                d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
+
+                data.wasDragged = true;
+            }
+        }
+
+        function onDragEnd(d) {
+            if (d.wasDragged === true) {
+                console.log('onDragEnd');
+            }
+
+            d.wasDragged = false;
+        }
+
+        // Define drag beavior
+        //var drag = d3.behavior.drag().on("drag", function (d){
+        //	var x = d3.event.x;
+        //	var y = d3.event.y;
+        //	d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
+        //});
+
+        // Define drag beavior
+        function clickCircle(data) {
+            if (d3.event.defaultPrevented === false) {
+                console.log(data.id);
+                $scope.clickInCicle = true;
+                var x,y;
+                x = d3.transform($("#"+data.id).attr("transform")).translate[0];
+                y = d3.transform($("#"+data.id).attr("transform")).translate[1];
+                selected = [x,y];
+            }
+        };
+
+        //svg.append("svg:image").attr("xlink:href", "images/plano_u.png").attr("width",800).attr("height",800).style("stroke-opacity", 0.5);
+
     })
 ;
