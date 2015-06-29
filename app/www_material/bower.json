@@ -1,0 +1,25 @@
+{
+  "name": "www_material",
+  "version": "1.0.0",
+  "authors": [
+    "Christian Mora <christmo99@gmail.com>"
+  ],
+  "description": "app ionic mapas",
+  "main": "index.html",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "ionic"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "www/lib",
+    "test",
+    "tests"
+  ]
+}
